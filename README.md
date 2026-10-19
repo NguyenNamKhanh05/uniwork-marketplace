@@ -13,9 +13,9 @@ Nền tảng việc làm part-time dành cho sinh viên.
 
 | Thành phần | Công nghệ |
 |---|---|
-| Frontend | ReactJS |
-| Backend | Spring Boot 3, Spring Security, JWT |
-| Database | MySQL |
+| Frontend | ReactJS 18 + Vite 5 |
+| Backend | Spring Boot 3.2.12, Java 21, Maven Wrapper |
+| Database | MySQL 8.0 |
 | ORM | Spring Data JPA |
 | API Docs | Swagger / OpenAPI |
 
@@ -23,6 +23,13 @@ Nền tảng việc làm part-time dành cho sinh viên.
 
 ```text
 .
+├── backend/                 # Spring Boot REST API
+│   ├── src/main/java/com/uniwork/backend
+│   ├── src/main/resources/application.yml
+│   └── pom.xml
+├── frontend/                # ReactJS + Vite
+│   ├── src/App.jsx
+│   └── package.json
 ├── docs/
 │   └── 03-api/              # Tài liệu thiết kế API
 ├── SRS_UniWork_v1.1.docx    # Đặc tả yêu cầu hệ thống
@@ -34,17 +41,96 @@ Nền tảng việc làm part-time dành cho sinh viên.
 └── công nghệ đã chọn.md
 ```
 
-> Khi bổ sung source code, tạo thêm `frontend/` và `backend/` ở thư mục gốc.
+## 4. Chạy thử dự án Hello World
 
-## 4. Thành viên nhóm
+### Yêu cầu môi trường
+
+- JDK 21 trở lên
+- Node.js 20 trở lên
+- MySQL 8.0
+- Maven Wrapper đã có sẵn trong `backend/`
+
+### Bước 1: Tạo database MySQL
+
+```sql
+CREATE DATABASE uniwork CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'uniwork'@'localhost' IDENTIFIED BY 'uniwork123';
+GRANT ALL PRIVILEGES ON uniwork.* TO 'uniwork'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Mặc định backend kết nối `localhost:3306`, database `uniwork`, user `uniwork`, mật khẩu `uniwork123`.
+
+Nếu MySQL chạy ở cổng khác, đặt biến môi trường `DB_PORT` trước khi chạy backend.
+
+### Bước 2: Chạy backend
+
+```powershell
+cd backend
+.\mvnw.cmd spring-boot:run
+```
+
+Nếu dùng macOS/Linux:
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+Ví dụ khi MySQL ở cổng `3307`:
+
+```powershell
+$env:DB_PORT="3307"
+.\mvnw.cmd spring-boot:run
+```
+
+### Bước 3: Chạy frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Mở trình duyệt tại `http://localhost:5173`.
+
+### Bước 4: Kiểm tra API
+
+- `GET http://localhost:8080/api/hello/ping`
+- `GET http://localhost:8080/api/hello`
+- `POST http://localhost:8080/api/hello`
+
+Body mẫu:
+
+```json
+{
+  "content": "Hello UniWork"
+}
+```
+
+### Bước 5: Chạy test
+
+```bash
+cd backend
+.\mvnw.cmd test
+```
+
+```bash
+cd frontend
+npm run build
+```
+
+Kết quả mong đợi: ReactJS gọi được REST API, Spring Boot ghi dữ liệu vào MySQL và dữ liệu hiển thị lại trên giao diện.
+
+## 5. Thành viên nhóm
 
 | STT | Họ và tên | MSSV | GitHub |
 |---|---|---|---|
-| 1 | Nguyễn Nam Khánh |  | `@NguyenNamKhanh05` |
-| 2 |  |  |  |
-| 3 |  |  |  |
+| 1 | Nguyễn Nam Khánh | 2374802010222 | `@NguyenNamKhanh05` |
+| 2 | Phạm Trí Trọng | 2374802010525 | `@tritrongpham0513` |
+| 3 | Nguyễn Trần Hoàng Vinh | 2374802010562 | `@NguyenVinh2504` |
 
-## 5. Quy trình làm việc với Git
+## 6. Quy trình làm việc với Git
 
 ### Nhánh
 
@@ -88,14 +174,14 @@ Nền tảng việc làm part-time dành cho sinh viên.
 
 Ví dụ: `feat: API dang ky tai khoan sinh vien`
 
-## 6. Tài liệu
+## 7. Tài liệu
 
 - [Thiết kế API](docs/03-api/API_Design_UniWork.md)
 - SRS: `SRS_UniWork_v1.1.docx`
 - Product backlog: `product backlog.xlsx`
 - Sơ đồ kiến trúc: `Buoi04_SoDo_KienTruc.drawio`
 
-## 7. Lưu ý
+## 8. Lưu ý
 
 - Không commit file chứa mật khẩu, API key hoặc thông tin cá nhân nhạy cảm.
 - Không commit `node_modules/`, `target/`, `.env`.
