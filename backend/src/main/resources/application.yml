@@ -55,6 +55,12 @@ spring:
 
 # Cấu hình tham số nghiệp vụ ứng dụng
 app:
+  auth:
+    # Bật xác thực email bắt buộc trước khi đăng nhập (mặc định tắt để chạy thử cục bộ)
+    email-verification-required: ${EMAIL_VERIFICATION_REQUIRED:false}
+  demo-data:
+    # Tự động tạo dữ liệu mẫu cho môi trường phát triển/demo
+    enabled: ${DEMO_DATA_ENABLED:true}
   jwt:
     secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000} # 24 giờ

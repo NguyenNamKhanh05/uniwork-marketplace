@@ -34,5 +34,14 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long>, JpaSpec
 
     @EntityGraph(attributePaths = {"employer", "category"})
     Page<JobPost> findByEmployerUserIdAndStatusAndDeletedAtIsNull(Long employerId, String status, Pageable pageable);
+
+    long countByEmployerUserIdAndDeletedAtIsNull(Long employerId);
+
+    long countByDeletedAtIsNull();
+
+    long countByStatusAndDeletedAtIsNull(String status);
+
+    @EntityGraph(attributePaths = {"employer", "category"})
+    Page<JobPost> findByDeletedAtIsNotNull(Pageable pageable);
 }
 

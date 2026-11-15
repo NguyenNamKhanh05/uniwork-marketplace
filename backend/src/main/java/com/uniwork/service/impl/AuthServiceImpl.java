@@ -65,8 +65,15 @@ public class AuthServiceImpl implements AuthService {
     private final MailService mailService;
     private final GoogleTokenVerifierService googleTokenVerifierService;
 
+    @org.springframework.beans.factory.annotation.Value("${app.auth.email-verification-required:false}")
+    private boolean emailVerificationRequired = false;
+
     private final SecureRandom secureRandom = new SecureRandom();
     private final Map<String, Instant> resendRateLimitMap = new ConcurrentHashMap<>();
+
+    private boolean emailVerificationRequired() {
+        return emailVerificationRequired;
+    }
 
     // ----------------------------------------------------------------
     // 1. ĐĂNG KÝ TÀI KHOẢN (POST /api/v1/auth/register)
@@ -94,12 +101,14 @@ public class AuthServiceImpl implements AuthService {
         Role role = roleRepository.findByCode(req.getRole().toUpperCase())
                 .orElseThrow(() -> new AppException("Vai trò không hợp lệ", HttpStatus.BAD_REQUEST, "INVALID_ROLE"));
 
-        // 1.5 Tạo tài khoản User (PENDING_VERIFY)
+        // 1.5 Tạo tài khoản User (chờ xác thực nếu bật yêu cầu xác thực email)
+        boolean verifyRequired = emailVerificationRequired();
         User user = User.builder()
                 .email(req.getEmail().trim().toLowerCase())
                 .passwordHash(passwordEncoder.encode(req.getPassword()))
                 .role(role)
-                .status("PENDING_VERIFY")
+                .status(verifyRequired ? "PENDING_VERIFY" : "ACTIVE")
+                .emailVerifiedAt(verifyRequired ? null : LocalDateTime.now())
                 .authProvider("LOCAL")
                 .build();
         user = userRepository.save(user);
@@ -122,22 +131,24 @@ public class AuthServiceImpl implements AuthService {
             employerProfileRepository.save(ep);
         }
 
-        // 1.7 Tạo token ngẫu nhiên an toàn (>= 32 bytes base64url)
-        byte[] tokenBytes = new byte[32];
-        secureRandom.nextBytes(tokenBytes);
-        String rawToken = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+        // 1.7 Tạo token ngẫu nhiên an toàn (>= 32 bytes base64url) và gửi email nếu bật xác thực
+        if (verifyRequired) {
+            byte[] tokenBytes = new byte[32];
+            secureRandom.nextBytes(tokenBytes);
+            String rawToken = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
 
-        // 1.8 CHỈ lưu SHA-256 hex vào user_tokens, hạn 24 giờ
-        UserToken userToken = UserToken.builder()
-                .user(user)
-                .tokenType("EMAIL_VERIFY")
-                .tokenHash(sha256Hex(rawToken))
-                .expiresAt(LocalDateTime.now().plusHours(24))
-                .build();
-        userTokenRepository.save(userToken);
+            // 1.8 CHỈ lưu SHA-256 hex vào user_tokens, hạn 24 giờ
+            UserToken userToken = UserToken.builder()
+                    .user(user)
+                    .tokenType("EMAIL_VERIFY")
+                    .tokenHash(sha256Hex(rawToken))
+                    .expiresAt(LocalDateTime.now().plusHours(24))
+                    .build();
+            userTokenRepository.save(userToken);
 
-        // 1.9 Gửi email kích hoạt bất đồng bộ qua Gmail SMTP
-        mailService.sendVerificationEmail(user.getEmail(), req.getFullName().trim(), rawToken);
+            // 1.9 Gửi email kích hoạt bất đồng bộ qua Gmail SMTP
+            mailService.sendVerificationEmail(user.getEmail(), req.getFullName().trim(), rawToken);
+        }
     }
 
     // ----------------------------------------------------------------
@@ -254,7 +265,7 @@ public class AuthServiceImpl implements AuthService {
                     HttpStatus.FORBIDDEN, "ACCOUNT_LOCKED");
         }
 
-        if ("PENDING_VERIFY".equals(user.getStatus())) {
+        if (emailVerificationRequired() && "PENDING_VERIFY".equals(user.getStatus())) {
             throw new AppException("Tài khoản chưa xác thực email. Vui lòng kiểm tra hộp thư hoặc gửi lại email xác thực.",
                     HttpStatus.FORBIDDEN, "EMAIL_NOT_VERIFIED");
         }

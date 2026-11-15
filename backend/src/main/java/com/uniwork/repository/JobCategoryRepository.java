@@ -12,6 +12,10 @@ public interface JobCategoryRepository extends JpaRepository<JobCategory, Short>
 
     List<JobCategory> findByIsActiveTrueOrderBySortOrderAsc();
 
+    List<JobCategory> findAllByOrderBySortOrderAscNameAsc();
+
     Optional<JobCategory> findBySlug(String slug);
+
+    boolean existsBySlug(String slug);
 }
 

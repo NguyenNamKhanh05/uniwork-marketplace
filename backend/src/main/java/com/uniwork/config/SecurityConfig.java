@@ -53,12 +53,17 @@ public class SecurityConfig {
                 // 2. Các endpoint xác thực còn lại là Public
                 .requestMatchers(ApiEndpoints.V1_AUTH + "/**").permitAll()
 
-                // 3. Tin việc làm công khai & Master data
+                // 3. Tin việc làm công khai, danh mục & Master data
                 .requestMatchers(HttpMethod.GET, ApiEndpoints.V1_PUBLIC_JOBS + "/**").permitAll()
                 .requestMatchers(HttpMethod.GET, ApiEndpoints.V1_PUBLIC_MASTER + "/**").permitAll()
+                .requestMatchers(HttpMethod.GET, ApiEndpoints.V1_CATEGORIES).permitAll()
+                .requestMatchers(HttpMethod.GET, ApiEndpoints.V1_REVIEWS).permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/jobs/public/**", "/api/public/**").permitAll()
 
-                // 4. Tài liệu Swagger / OpenAPI UI & Static Test Pages
+                // 4. Nộp đơn ứng tuyển là thao tác của sinh viên
+                .requestMatchers(HttpMethod.POST, ApiEndpoints.V1_PUBLIC_JOBS + "/*/applications").hasRole("STUDENT")
+
+                // 5. Tài liệu Swagger / OpenAPI UI & Static Test Pages
                 .requestMatchers(
                     "/swagger-ui.html",
                     "/swagger-ui/**",
@@ -69,12 +74,12 @@ public class SecurityConfig {
                     "/error"
                 ).permitAll()
 
-                // 5. RBAC theo vai trò
+                // 6. RBAC theo vai trò
                 .requestMatchers(ApiEndpoints.V1_STUDENT + "/**", "/api/student/**").hasRole("STUDENT")
                 .requestMatchers(ApiEndpoints.V1_EMPLOYER + "/**", "/api/employer/**").hasRole("EMPLOYER")
                 .requestMatchers(ApiEndpoints.V1_ADMIN + "/**", "/api/admin/**").hasRole("ADMIN")
 
-                // 6. Mọi request khác yêu cầu xác thực
+                // 7. Mọi request khác yêu cầu xác thực
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

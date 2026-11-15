@@ -45,7 +45,18 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản.", null));
+                .body(ApiResponse.success("Đăng ký tài khoản thành công.", null));
+    }
+
+    /**
+     * POST /api/v1/auth/logout
+     * JWT stateless nên đăng xuất chỉ cần client xóa token; endpoint xác nhận thao tác.
+     */
+    @PostMapping("/logout")
+    @Operation(summary = "Đăng xuất khỏi hệ thống")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        return ResponseEntity.ok(ApiResponse.success("Đăng xuất thành công", null));
     }
 
     /**

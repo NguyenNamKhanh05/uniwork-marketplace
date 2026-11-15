@@ -96,8 +96,41 @@ class AuthServiceTest {
     // ================================================================
 
     @Test
-    @DisplayName("Đăng ký Sinh viên thành công -> status = PENDING_VERIFY, lưu token SHA-256, gửi mail")
+    @DisplayName("Đăng ký Sinh viên thành công -> status = ACTIVE (không bắt buộc xác thực email)")
     void register_Success_Student() {
+        RegisterRequest req = RegisterRequest.builder()
+                .email("student@uniwork.vn")
+                .fullName("Nguyễn Nam Khánh")
+                .password("Password123")
+                .confirmPassword("Password123")
+                .role("STUDENT")
+                .build();
+
+        when(userRepository.existsByEmail("student@uniwork.vn")).thenReturn(false);
+        when(roleRepository.findByCode("STUDENT")).thenReturn(Optional.of(studentRole));
+        when(passwordEncoder.encode(req.getPassword())).thenReturn("$2a$10$hashedPassword");
+
+        User savedUser = User.builder()
+                .id(1L)
+                .email(req.getEmail())
+                .role(studentRole)
+                .status("ACTIVE")
+                .build();
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        authService.register(req);
+
+        verify(userRepository).save(argThat(user -> "ACTIVE".equals(user.getStatus()) && "LOCAL".equals(user.getAuthProvider())));
+        verify(studentProfileRepository).save(any(StudentProfile.class));
+        verify(userTokenRepository, never()).save(any(UserToken.class));
+        verify(mailService, never()).sendVerificationEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Đăng ký khi bật xác thực email -> status = PENDING_VERIFY, lưu token SHA-256, gửi mail")
+    void register_Success_Student_WhenVerificationRequired() {
+        org.springframework.test.util.ReflectionTestUtils.setField(authService, "emailVerificationRequired", true);
+
         RegisterRequest req = RegisterRequest.builder()
                 .email("student@uniwork.vn")
                 .fullName("Nguyễn Nam Khánh")
@@ -284,8 +317,10 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Đăng nhập đúng mật khẩu nhưng status = PENDING_VERIFY -> Ném 403 EMAIL_NOT_VERIFIED")
+    @DisplayName("Đăng nhập đúng mật khẩu nhưng status = PENDING_VERIFY và bật xác thực email -> Ném 403 EMAIL_NOT_VERIFIED")
     void login_ThrowsForbidden_WhenPendingVerify() {
+        org.springframework.test.util.ReflectionTestUtils.setField(authService, "emailVerificationRequired", true);
+
         LoginRequest req = new LoginRequest("unverified@uniwork.vn", "Password123");
         User user = User.builder().id(1L).email(req.getEmail()).passwordHash("$2a$10$hash").status("PENDING_VERIFY").build();
 

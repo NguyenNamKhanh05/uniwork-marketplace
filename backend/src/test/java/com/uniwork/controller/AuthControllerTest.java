@@ -77,7 +77,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản."));
+                .andExpect(jsonPath("$.message").value("Đăng ký tài khoản thành công."));
     }
 
     @Test

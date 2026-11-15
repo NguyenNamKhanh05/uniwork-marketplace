@@ -9,9 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * JPA Specification hỗ trợ tìm kiếm và lọc đa tiêu chí cho tin tuyển dụng (FR-04, NFR-01).
- */
 public class JobPostSpecification {
 
     public static Specification<JobPost> filterPublicJobs(
@@ -20,56 +17,62 @@ public class JobPostSpecification {
             Short provinceId,
             String workMode,
             String salaryType,
-            BigDecimal minSalary
+            BigDecimal minSalary,
+            BigDecimal maxSalary
     ) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // 1. Chỉ lấy bài chưa xóa và trạng thái OPEN
             predicates.add(cb.isNull(root.get("deletedAt")));
             predicates.add(cb.equal(root.get("status"), "OPEN"));
-
-            // 2. Chưa hết hạn nộp hồ sơ (nếu có set deadline)
             predicates.add(cb.or(
                     cb.isNull(root.get("applicationDeadline")),
                     cb.greaterThanOrEqualTo(root.get("applicationDeadline"), LocalDateTime.now())
             ));
+            predicates.add(cb.equal(root.get("employer").get("user").get("status"), "ACTIVE"));
 
-            // 3. Tìm theo từ khóa (tiêu đề hoặc mô tả)
             if (keyword != null && !keyword.trim().isEmpty()) {
                 String pattern = "%" + keyword.trim().toLowerCase() + "%";
                 Predicate titleLike = cb.like(cb.lower(root.get("title")), pattern);
                 Predicate descLike = cb.like(cb.lower(root.get("description")), pattern);
                 predicates.add(cb.or(titleLike, descLike));
             }
-
-            // 4. Lọc theo danh mục
             if (categoryId != null) {
                 predicates.add(cb.equal(root.get("category").get("id"), categoryId));
             }
-
-            // 5. Lọc theo tỉnh/thành
             if (provinceId != null) {
                 predicates.add(cb.equal(root.get("provinceId"), provinceId));
             }
-
-            // 6. Lọc theo hình thức làm việc (ONSITE / REMOTE / HYBRID)
             if (workMode != null && !workMode.trim().isEmpty()) {
                 predicates.add(cb.equal(root.get("workMode"), workMode.trim()));
             }
-
-            // 7. Lọc theo hình thức lương (HOURLY / DAILY...)
             if (salaryType != null && !salaryType.trim().isEmpty()) {
                 predicates.add(cb.equal(root.get("salaryType"), salaryType.trim()));
             }
-
-            // 8. Lọc theo mức lương tối thiểu
             if (minSalary != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("salaryMin"), minSalary));
+            }
+            if (maxSalary != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("salaryMin"), maxSalary));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
-}
 
+    public static Specification<JobPost> filterAdminJobs(String keyword, String status, Boolean hidden) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("title")), "%" + keyword.trim().toLowerCase() + "%"));
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                predicates.add(cb.equal(root.get("status"), status.trim()));
+            }
+            if (hidden != null) {
+                predicates.add(hidden ? cb.isNotNull(root.get("deletedAt")) : cb.isNull(root.get("deletedAt")));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+}
