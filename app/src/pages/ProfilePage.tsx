@@ -169,6 +169,15 @@ export function ProfilePage() {
           <p>
             {profile.email} ·{" "}
             {profile.role === "STUDENT" ? "Sinh viên" : profile.role === "EMPLOYER" ? "Nhà tuyển dụng" : "Quản trị viên"}
+            {profile.role === "EMPLOYER" && (
+              <>
+                {" "}
+                ·{" "}
+                {profile.avgRating != null
+                  ? `Điểm uy tín ${profile.avgRating.toFixed(1)}/5 (${profile.ratingCount ?? 0} đánh giá)`
+                  : "Chưa có đánh giá"}
+              </>
+            )}
           </p>
         </div>
       </div>

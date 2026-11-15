@@ -311,6 +311,10 @@ public class JobService {
         if (!"NEGOTIABLE".equals(salaryType) && request.salaryMin() == null) {
             throw new AppException("Vui lòng nhập mức lương tối thiểu", HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");
         }
+        if (!"NEGOTIABLE".equals(salaryType) && request.salaryMin() != null
+                && request.salaryMin().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new AppException("Mức lương phải lớn hơn 0", HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");
+        }
         if (request.salaryMin() != null && request.salaryMax() != null
                 && request.salaryMax().compareTo(request.salaryMin()) < 0) {
             throw new AppException("Mức lương tối đa phải lớn hơn hoặc bằng mức lương tối thiểu", HttpStatus.BAD_REQUEST, "VALIDATION_ERROR");

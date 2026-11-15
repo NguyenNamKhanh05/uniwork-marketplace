@@ -49,12 +49,20 @@ export function AdminUsersPage() {
     if (!window.confirm(`Bạn chắc chắn muốn ${labels[nextStatus]} tài khoản này?`)) {
       return;
     }
+    let reason: string | null = null;
+    if (nextStatus !== "ACTIVE") {
+      const input = window.prompt("Lý do vi phạm (có thể bỏ trống):");
+      if (input === null) {
+        return;
+      }
+      reason = input.trim() || null;
+    }
     setError("");
     setMessage("");
     try {
       await api.patch(`/admin/users/${id}/status`, {
         status: nextStatus,
-        reason: null,
+        reason,
       });
       setMessage("Cập nhật trạng thái người dùng thành công.");
       load();

@@ -12,6 +12,13 @@ const WORK_MODE_OPTIONS = [
   { value: "HYBRID", label: "Kết hợp" },
 ];
 
+const SALARY_RANGE_OPTIONS = [
+  { value: "", label: "Tất cả mức thù lao" },
+  { value: "0-25000", label: "Dưới 25.000 đ" },
+  { value: "25000-50000", label: "25.000 - 50.000 đ" },
+  { value: "50000-", label: "Trên 50.000 đ" },
+];
+
 export function JobListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -30,6 +37,16 @@ export function JobListPage() {
         params[key] = value;
       }
     });
+    const range = searchParams.get("salaryRange");
+    if (range) {
+      const [min, max] = range.split("-");
+      if (min) {
+        params.minSalary = min;
+      }
+      if (max) {
+        params.maxSalary = max;
+      }
+    }
     params.page = String(page);
     params.size = "10";
     return params;
@@ -75,7 +92,7 @@ export function JobListPage() {
       <div className="page-header">
         <div>
           <h1>Tìm việc làm</h1>
-          <p>Lọc theo danh mục, địa điểm và hình thức làm việc.</p>
+          <p>Lọc theo danh mục, địa điểm, hình thức và mức thù lao.</p>
         </div>
       </div>
 
@@ -128,6 +145,20 @@ export function JobListPage() {
               onChange={(event) => update("workMode", event.target.value)}
             >
               {WORK_MODE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="salaryRange">Mức thù lao</label>
+            <select
+              id="salaryRange"
+              value={searchParams.get("salaryRange") ?? ""}
+              onChange={(event) => update("salaryRange", event.target.value)}
+            >
+              {SALARY_RANGE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>

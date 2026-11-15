@@ -114,7 +114,7 @@ export function ReviewsPage() {
                       id="comment"
                       value={comment}
                       onChange={(event) => setComment(event.target.value)}
-                      maxLength={1000}
+                      maxLength={500}
                     />
                   </div>
                 </div>

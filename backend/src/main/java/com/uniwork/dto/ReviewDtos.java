@@ -19,7 +19,7 @@ public final class ReviewDtos {
             @Max(value = 5, message = "Điểm đánh giá từ 1 đến 5")
             Integer rating,
 
-            @Size(max = 1000, message = "Nhận xét tối đa 1000 ký tự")
+            @Size(max = 500, message = "Nhận xét tối đa 500 ký tự")
             String comment
     ) {
     }
