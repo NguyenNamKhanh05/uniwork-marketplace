@@ -79,18 +79,19 @@ public class AuthController {
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <title>Xác thực thành công - UniWork</title>
                         <style>
-                            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f8fafc; }
-                            .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; }
-                            .icon { width: 64px; height: 64px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; }
-                            h1 { color: #1e293b; font-size: 22px; margin-bottom: 12px; }
-                            p { color: #64748b; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+                            body { font-family: "Segoe UI", Arial, sans-serif; background: #f4f6f9; color: #1f2a37; margin: 0; padding: 24px; }
+                            .card { max-width: 520px; margin: 64px auto; background: #ffffff; border: 1px solid #d8dee6; border-top: 3px solid #ee7a17; border-radius: 4px; padding: 32px; }
+                            .brand { font-size: 20px; font-weight: 700; color: #ee7a17; margin-bottom: 20px; }
+                            h1 { font-size: 22px; color: #0f3a63; margin: 0 0 12px; }
+                            p { font-size: 15px; line-height: 1.6; color: #5d6b7a; margin: 0 0 12px; }
                         </style>
                     </head>
                     <body>
                         <div class="card">
-                            <div class="icon">✓</div>
+                            <div class="brand">UniWork</div>
                             <h1>Xác thực email thành công!</h1>
-                            <p>Tài khoản của bạn đã được kích hoạt thành công. Bây giờ bạn có thể đăng nhập vào UniWork Marketplace để bắt đầu tìm kiếm hoặc đăng tin việc làm.</p>
+                            <p>Tài khoản của bạn đã được kích hoạt. Bạn có thể đăng nhập vào UniWork để tìm việc hoặc đăng tin tuyển dụng.</p>
+                            <p>Bạn có thể đóng trang này và quay lại ứng dụng.</p>
                         </div>
                     </body>
                     </html>
@@ -106,16 +107,16 @@ public class AuthController {
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <title>Xác thực thất bại - UniWork</title>
                         <style>
-                            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f8fafc; }
-                            .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 90%; }
-                            .icon { width: 64px; height: 64px; background: #fee2e2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 20px; }
-                            h1 { color: #1e293b; font-size: 22px; margin-bottom: 12px; }
-                            p { color: #64748b; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+                            body { font-family: "Segoe UI", Arial, sans-serif; background: #f4f6f9; color: #1f2a37; margin: 0; padding: 24px; }
+                            .card { max-width: 520px; margin: 64px auto; background: #ffffff; border: 1px solid #d8dee6; border-top: 3px solid #b3261e; border-radius: 4px; padding: 32px; }
+                            .brand { font-size: 20px; font-weight: 700; color: #ee7a17; margin-bottom: 20px; }
+                            h1 { font-size: 22px; color: #0f3a63; margin: 0 0 12px; }
+                            p { font-size: 15px; line-height: 1.6; color: #5d6b7a; margin: 0 0 12px; }
                         </style>
                     </head>
                     <body>
                         <div class="card">
-                            <div class="icon">✕</div>
+                            <div class="brand">UniWork</div>
                             <h1>Xác thực không thành công</h1>
                             <p>{{ERROR_MSG}}</p>
                         </div>

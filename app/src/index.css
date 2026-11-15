@@ -3,15 +3,18 @@
 }
 
 :root {
-  --border: #d6d9de;
-  --text: #1f2328;
-  --muted: #5c6470;
-  --primary: #1b4f72;
-  --primary-dark: #123a55;
+  --border: #d8dee6;
+  --text: #1f2a37;
+  --muted: #5d6b7a;
+  --heading: #0f3a63;
+  --primary: #ee7a17;
+  --primary-dark: #cf6509;
+  --link: #0d5aa7;
   --background: #ffffff;
-  --surface: #f5f6f7;
-  --danger: #8a1f1f;
-  --success: #1f5c34;
+  --surface: #f4f6f9;
+  --surface-blue: #eef4fa;
+  --danger: #b3261e;
+  --success: #1e7a3c;
 }
 
 html,
@@ -29,7 +32,7 @@ body {
 }
 
 a {
-  color: var(--primary);
+  color: var(--link);
   text-decoration: none;
 }
 
@@ -43,6 +46,7 @@ h3,
 h4 {
   line-height: 1.3;
   margin: 0 0 12px;
+  color: var(--heading);
 }
 
 h1 {
@@ -76,6 +80,7 @@ p {
 
 .site-header {
   border-bottom: 1px solid var(--border);
+  border-top: 3px solid var(--primary);
   background: var(--background);
 }
 
@@ -83,14 +88,15 @@ p {
   display: flex;
   align-items: center;
   gap: 18px;
-  min-height: 58px;
+  min-height: 60px;
   flex-wrap: wrap;
 }
 
 .brand {
   font-weight: 700;
-  font-size: 19px;
-  color: var(--text);
+  font-size: 21px;
+  letter-spacing: -0.2px;
+  color: var(--primary);
   margin-right: 8px;
 }
 
@@ -104,11 +110,18 @@ p {
 .main-nav a {
   padding: 7px 9px;
   border-radius: 4px;
-  color: var(--text);
+  color: #26384c;
+}
+
+.main-nav a:hover {
+  color: var(--primary);
+  background: #fdf1e5;
+  text-decoration: none;
 }
 
 .main-nav a.active {
-  background: var(--surface);
+  background: #fdf1e5;
+  color: var(--primary-dark);
   font-weight: 600;
 }
 
@@ -211,6 +224,21 @@ p {
   background: var(--background);
 }
 
+.hero {
+  background: var(--surface-blue);
+  border-color: #d3e0ee;
+  padding: 26px 24px;
+}
+
+.hero h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.hero p {
+  max-width: 620px;
+}
+
 .panel-title {
   display: flex;
   justify-content: space-between;
@@ -258,7 +286,7 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 2px solid #a9c3d6;
+  outline: 2px solid #f6c79b;
   outline-offset: 0;
   border-color: var(--primary);
 }
@@ -321,6 +349,10 @@ textarea {
   background: var(--background);
 }
 
+.job-card:hover {
+  border-color: #f0b27a;
+}
+
 .job-card h3 {
   margin: 0 0 6px;
 }
@@ -336,7 +368,7 @@ textarea {
 
 .job-salary {
   font-weight: 600;
-  color: var(--primary);
+  color: #d9640a;
 }
 
 .job-actions {
@@ -374,7 +406,13 @@ textarea {
   border-radius: 12px;
   background: var(--surface);
   font-size: 12px;
-  color: var(--muted);
+  color: #45566a;
+}
+
+a.tag:hover {
+  border-color: var(--primary);
+  color: var(--primary-dark);
+  text-decoration: none;
 }
 
 .status {
@@ -426,7 +464,8 @@ td {
 }
 
 th {
-  background: var(--surface);
+  background: var(--surface-blue);
+  color: var(--heading);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -517,6 +556,7 @@ th {
   display: block;
   font-size: 24px;
   margin-bottom: 2px;
+  color: var(--heading);
 }
 
 .schedule-row {

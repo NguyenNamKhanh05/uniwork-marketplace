@@ -34,7 +34,7 @@ export function HomePage() {
 
   return (
     <div className="stack">
-      <section className="panel">
+      <section className="panel hero">
         <h1>Việc làm bán thời gian cho sinh viên</h1>
         <p className="muted">
           Tìm việc làm phù hợp với lịch học, ứng tuyển trực tuyến và theo dõi trạng thái
