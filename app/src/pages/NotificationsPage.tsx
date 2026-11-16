@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { api, errorMessage, unwrap } from "../api";
+import { useAuth } from "../auth";
 import { Pagination } from "../components/Pagination";
 import type { Notification, PageResponse } from "../types";
 import { dateTimeText } from "../format";
 
 export function NotificationsPage() {
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [page, setPage] = useState(0);
@@ -59,8 +61,13 @@ export function NotificationsPage() {
     if (notification.refType === "JOB") {
       return `/jobs/${notification.refId}`;
     }
+    if (notification.refType === "JOB_POST" && user?.role === "EMPLOYER") {
+      return `/employer/jobs/${notification.refId}`;
+    }
     if (notification.refType === "APPLICATION") {
-      return `/student/applications/${notification.refId}`;
+      return user?.role === "EMPLOYER"
+        ? `/employer/applications/${notification.refId}`
+        : `/student/applications/${notification.refId}`;
     }
     return null;
   };
