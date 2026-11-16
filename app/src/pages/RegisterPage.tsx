@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { api, errorMessage } from "../api";
 
 export function RegisterPage() {
-  const navigate = useNavigate();
   const [form, setForm] = useState({
     role: "STUDENT",
     fullName: "",
@@ -13,7 +12,10 @@ export function RegisterPage() {
     employerType: "COMPANY",
   });
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [registered, setRegistered] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const update = (key: string, value: string) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -36,13 +38,66 @@ export function RegisterPage() {
         confirmPassword: form.confirmPassword,
         employerType: form.role === "EMPLOYER" ? form.employerType : undefined,
       });
-      navigate("/login", { replace: true });
+      setRegistered(true);
     } catch (err) {
       setError(errorMessage(err));
     } finally {
       setLoading(false);
     }
   };
+
+  const resend = async () => {
+    setError("");
+    setMessage("");
+    setResending(true);
+    try {
+      await api.post("/auth/resend-verification", { email: form.email.trim() });
+      setMessage("Đã gửi lại email xác thực. Vui lòng kiểm tra hộp thư.");
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setResending(false);
+    }
+  };
+
+  if (registered) {
+    return (
+      <div style={{ maxWidth: 560, margin: "0 auto" }}>
+        <div className="page-header">
+          <div>
+            <h1>Kiểm tra email để hoàn tất đăng ký</h1>
+            <p>Tài khoản chỉ được kích hoạt sau khi bạn xác thực địa chỉ email.</p>
+          </div>
+        </div>
+
+        <section className="panel">
+          {error && <p className="notice notice-error">{error}</p>}
+          {message && <p className="notice notice-success">{message}</p>}
+          <p>
+            Chúng tôi đã gửi liên kết xác thực tới <strong>{form.email.trim()}</strong>.
+          </p>
+          <p>
+            Mở email, bấm nút "Xác thực tài khoản của tôi" để kích hoạt tài khoản. Liên kết có
+            hiệu lực trong 24 giờ.
+          </p>
+          <p>Nếu không thấy email, hãy kiểm tra mục Spam hoặc gửi lại email xác thực.</p>
+          <div className="form-actions">
+            <button
+              type="button"
+              className="button button-primary"
+              onClick={resend}
+              disabled={resending}
+            >
+              {resending ? "Đang gửi..." : "Gửi lại email xác thực"}
+            </button>
+            <Link className="button button-plain" to="/login">
+              Đến trang đăng nhập
+            </Link>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: 560, margin: "0 auto" }}>

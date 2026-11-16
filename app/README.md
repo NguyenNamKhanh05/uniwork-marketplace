@@ -49,6 +49,10 @@ src/
 
 Token đăng nhập lưu ở `localStorage` với khóa `uniwork_token`. Khi API trả về 401, token bị xóa và ứng dụng chuyển về trạng thái chưa đăng nhập.
 
+## Xác thực email
+
+Đăng ký tài khoản sẽ gửi email chứa liên kết xác thực. Tài khoản ở trạng thái chờ cho tới khi bấm liên kết; sau đó đăng nhập chỉ cần email và mật khẩu. Trang đăng ký và đăng nhập đều có nút gửi lại email xác thực.
+
 ## Tài khoản demo
 
 | Vai trò | Email | Mật khẩu |

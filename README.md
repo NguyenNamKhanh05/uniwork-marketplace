@@ -22,6 +22,14 @@ Hệ thống gồm hai phần chạy độc lập trong cùng repo:
 
 ## 2. Chức năng chính
 
+### Tài khoản và xác thực email
+
+- Đăng ký bằng email và mật khẩu, chọn vai trò sinh viên hoặc nhà tuyển dụng.
+- Hệ thống gửi email chứa liên kết xác thực, hiệu lực 24 giờ. Tài khoản chỉ được kích hoạt sau khi bấm liên kết.
+- Chưa xác thực thì đăng nhập bị chặn với thông báo gửi lại email; trang đăng ký và đăng nhập đều có nút gửi lại, giới hạn 60 giây mỗi lần.
+- Sau khi xác thực, đăng nhập chỉ cần email và mật khẩu, không cần xác thực lại.
+- Đăng nhập bằng Google được xem là email đã xác thực.
+
 ### Tìm việc và xem tin
 
 - Tìm theo từ khóa trong tiêu đề, mô tả và yêu cầu công việc.
@@ -158,6 +166,9 @@ $env:DB_URL="jdbc:mysql://localhost:3306/uniwork?useSSL=false&serverTimezone=UTC
 $env:DB_USERNAME="uniwork"
 $env:DB_PASSWORD="uniwork123"
 $env:DEMO_DATA_ENABLED="true"
+$env:MAIL_USERNAME="your-email@gmail.com"
+$env:MAIL_PASSWORD="your-gmail-app-password"
+$env:APP_BASE_URL="http://localhost:8080"
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -169,8 +180,13 @@ export DB_URL="jdbc:mysql://localhost:3306/uniwork?useSSL=false&serverTimezone=U
 export DB_USERNAME=uniwork
 export DB_PASSWORD=uniwork123
 export DEMO_DATA_ENABLED=true
+export MAIL_USERNAME=your-email@gmail.com
+export MAIL_PASSWORD=your-gmail-app-password
+export APP_BASE_URL=http://localhost:8080
 ./mvnw spring-boot:run
 ```
+
+Nếu chưa có Gmail App Password, có thể bỏ qua hai biến `MAIL_*`; liên kết xác thực sẽ được ghi ra log backend để dùng tạm khi phát triển.
 
 Backend chạy tại `http://localhost:8080`, Swagger UI tại `http://localhost:8080/swagger-ui.html`.
 
@@ -213,6 +229,8 @@ Khi `DEMO_DATA_ENABLED=true` và database còn trống, hệ thống tự tạo 
 | Nhà tuyển dụng | `employer@uniwork.vn` | `Employer@123` |
 | Nhà tuyển dụng | `employer2@uniwork.vn` | `Employer@123` |
 
+Danh sách đầy đủ kèm ghi chú nằm trong `docs/tai-khoan-demo.txt`.
+
 Tài khoản admin lấy từ `ADMIN_INITIAL_EMAIL` và `ADMIN_INITIAL_PASSWORD`; nếu để trống thì bỏ qua bước tạo admin.
 
 ## 8. Biến môi trường
@@ -224,7 +242,7 @@ Tài khoản admin lấy từ `ADMIN_INITIAL_EMAIL` và `ADMIN_INITIAL_PASSWORD`
 | `DB_PASSWORD` | `root` | Mật khẩu database |
 | `JWT_SECRET` | khóa mẫu trong `application.yml` | Khóa ký JWT, phải đổi khi triển khai thật |
 | `JWT_EXPIRATION_MS` | `86400000` | Thời hạn token, 24 giờ |
-| `EMAIL_VERIFICATION_REQUIRED` | `false` | Bắt buộc xác thực email trước khi đăng nhập |
+| `EMAIL_VERIFICATION_REQUIRED` | `true` | Bắt buộc xác thực email trước khi đăng nhập |
 | `DEMO_DATA_ENABLED` | `true` | Tạo dữ liệu mẫu khi database trống |
 | `MAIL_HOST`, `MAIL_PORT` | `smtp.gmail.com`, `587` | Máy chủ gửi mail |
 | `MAIL_USERNAME`, `MAIL_PASSWORD` | rỗng | Tài khoản Gmail và App Password để gửi mail |
@@ -237,8 +255,9 @@ Tài khoản admin lấy từ `ADMIN_INITIAL_EMAIL` và `ADMIN_INITIAL_PASSWORD`
 
 Ghi chú:
 
-- Mặc định `EMAIL_VERIFICATION_REQUIRED=false` nên đăng ký xong là đăng nhập được ngay, không cần cấu hình mail.
-- Bật `EMAIL_VERIFICATION_REQUIRED=true` thì phải điền `MAIL_USERNAME` và `MAIL_PASSWORD` (Gmail App Password), đồng thời đặt `APP_BASE_URL` đúng để link xác thực trỏ về backend.
+- Mặc định bật xác thực email: sau khi đăng ký, tài khoản ở trạng thái chờ xác thực và chỉ đăng nhập được sau khi bấm liên kết trong email. Đăng nhập về sau chỉ cần email và mật khẩu, không cần xác thực lại.
+- Để gửi email thật, điền `MAIL_USERNAME` và `MAIL_PASSWORD` (Gmail App Password), đồng thời đặt `APP_BASE_URL` đúng để link xác thực trỏ về backend.
+- Nếu chưa cấu hình `MAIL_USERNAME`, hệ thống không gửi mail mà ghi liên kết xác thực ra log backend với mức `WARN`, dùng được khi chạy cục bộ.
 - Đăng nhập Google chỉ hoạt động khi thay `GOOGLE_CLIENT_ID` bằng Client ID thật từ Google Cloud Console.
 
 ## 9. Luồng nghiệp vụ chính
@@ -271,7 +290,7 @@ Tất cả endpoint nằm dưới `/api/v1`, phản hồi bọc trong `{ "succes
 
 | Nhóm | Endpoint tiêu biểu |
 |---|---|
-| Xác thực | `POST /auth/register`, `POST /auth/login`, `POST /auth/google`, `GET /auth/me`, `GET /auth/verify-email` |
+| Xác thực | `POST /auth/register`, `POST /auth/login`, `POST /auth/google`, `GET /auth/me`, `GET /auth/verify-email`, `POST /auth/resend-verification` |
 | Hồ sơ | `GET /profiles/me`, `PUT /profiles/me` |
 | CV | `GET/POST /student/resumes`, `PUT/DELETE /student/resumes/{id}` |
 | Việc làm công khai | `GET /jobs`, `GET /jobs/{id}` |

@@ -56,8 +56,8 @@ spring:
 # Cấu hình tham số nghiệp vụ ứng dụng
 app:
   auth:
-    # Bật xác thực email bắt buộc trước khi đăng nhập (mặc định tắt để chạy thử cục bộ)
-    email-verification-required: ${EMAIL_VERIFICATION_REQUIRED:false}
+    # Bật xác thực email bắt buộc: đăng ký xong phải bấm liên kết trong email mới đăng nhập được
+    email-verification-required: ${EMAIL_VERIFICATION_REQUIRED:true}
   demo-data:
     # Tự động tạo dữ liệu mẫu cho môi trường phát triển/demo
     enabled: ${DEMO_DATA_ENABLED:true}

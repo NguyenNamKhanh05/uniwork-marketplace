@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { errorMessage } from "../api";
+import { api, errorMessage } from "../api";
 import { useAuth } from "../auth";
 
 export function LoginPage() {
@@ -10,20 +10,41 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [needVerify, setNeedVerify] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setMessage("");
+    setNeedVerify(false);
     try {
       await login(email.trim(), password);
       const from = (location.state as { from?: string } | null)?.from;
       navigate(from ?? "/", { replace: true });
     } catch (err) {
-      setError(errorMessage(err));
+      const detail = errorMessage(err);
+      setError(detail);
+      setNeedVerify(detail.includes("xác thực email"));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const resend = async () => {
+    setError("");
+    setMessage("");
+    setResending(true);
+    try {
+      await api.post("/auth/resend-verification", { email: email.trim() });
+      setMessage("Đã gửi lại email xác thực. Vui lòng kiểm tra hộp thư.");
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setResending(false);
     }
   };
 
@@ -38,6 +59,19 @@ export function LoginPage() {
 
       <section className="panel">
         {error && <p className="notice notice-error">{error}</p>}
+        {message && <p className="notice notice-success">{message}</p>}
+        {needVerify && (
+          <div className="form-actions" style={{ marginBottom: 12 }}>
+            <button
+              type="button"
+              className="button button-plain"
+              onClick={resend}
+              disabled={resending || !email.trim()}
+            >
+              {resending ? "Đang gửi..." : "Gửi lại email xác thực"}
+            </button>
+          </div>
+        )}
         <form onSubmit={submit}>
           <div style={{ marginBottom: 12 }}>
             <label htmlFor="email">Email</label>
@@ -68,13 +102,6 @@ export function LoginPage() {
             </Link>
           </div>
         </form>
-
-        <div className="help">
-          <p>Tài khoản dùng thử:</p>
-          <p>Sinh viên: student@uniwork.vn / Student@123</p>
-          <p>Nhà tuyển dụng: employer@uniwork.vn / Employer@123</p>
-          <p>Quản trị viên: admin@uniwork.vn / Admin@123</p>
-        </div>
       </section>
     </div>
   );

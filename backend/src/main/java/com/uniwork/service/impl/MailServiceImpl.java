@@ -31,12 +31,22 @@ public class MailServiceImpl implements MailService {
     @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
 
+    @Value("${spring.mail.username:}")
+    private String mailUsername;
+
     @Override
     @Async("mailTaskExecutor")
     public void sendVerificationEmail(String toEmail, String fullName, String rawToken) {
-        try {
-            String verifyUrl = baseUrl + ApiEndpoints.V1_AUTH + "/verify-email?token=" + rawToken;
+        String verifyUrl = baseUrl + ApiEndpoints.V1_AUTH + "/verify-email?token=" + rawToken;
 
+        // Chưa cấu hình tài khoản SMTP: ghi liên kết ra log để vẫn hoàn tất được luồng xác thực khi chạy cục bộ
+        if (mailUsername == null || mailUsername.isBlank()) {
+            log.warn("Chưa cấu hình MAIL_USERNAME/MAIL_PASSWORD. Không gửi được email tới {}. Liên kết xác thực: {}",
+                    toEmail, verifyUrl);
+            return;
+        }
+
+        try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, false, StandardCharsets.UTF_8.name());
 

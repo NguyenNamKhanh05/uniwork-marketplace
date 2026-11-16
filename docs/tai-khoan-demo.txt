@@ -1,0 +1,27 @@
+DANH SÁCH TÀI KHOẢN DÙNG THỬ - UNIWORK MARKETPLACE
+
+Các tài khoản dưới đây được tạo tự động khi chạy backend với DEMO_DATA_ENABLED=true
+và cơ sở dữ liệu còn trống.
+
+1. Quản trị viên
+   Email: admin@uniwork.vn
+   Mật khẩu: Admin@123
+   Ghi chú: tài khoản lấy từ biến ADMIN_INITIAL_EMAIL và ADMIN_INITIAL_PASSWORD.
+
+2. Sinh viên
+   Email: student@uniwork.vn
+   Mật khẩu: Student@123
+
+   Email: student2@uniwork.vn
+   Mật khẩu: Student@123
+
+3. Nhà tuyển dụng
+   Email: employer@uniwork.vn
+   Mật khẩu: Employer@123
+
+   Email: employer2@uniwork.vn
+   Mật khẩu: Employer@123
+
+Lưu ý:
+- Đây là tài khoản mẫu, chỉ dùng khi chạy thử hoặc demo, không dùng cho môi trường thật.
+- Tài khoản đăng ký mới phải xác thực email trước khi đăng nhập.
