@@ -190,6 +190,17 @@ Nếu chưa có Gmail App Password, có thể bỏ qua hai biến `MAIL_*`; liê
 
 Backend chạy tại `http://localhost:8080`, Swagger UI tại `http://localhost:8080/swagger-ui.html`.
 
+Có thể đặt các biến trên trong `backend/.env` thay vì đặt thủ công mỗi lần chạy. File này được nạp tự động và đã nằm trong `.gitignore`:
+
+```dotenv
+DB_URL=jdbc:mysql://localhost:3306/uniwork?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+DB_USERNAME=uniwork
+DB_PASSWORD=uniwork123
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-gmail-app-password
+APP_BASE_URL=http://localhost:8080
+```
+
 Đóng gói file jar:
 
 ```powershell

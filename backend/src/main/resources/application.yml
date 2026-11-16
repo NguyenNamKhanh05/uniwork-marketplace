@@ -3,6 +3,9 @@ server:
   address: 0.0.0.0
 
 spring:
+  config:
+    # Đọc file backend/.env nếu có, để cấu hình SMTP/DB mà không cần đặt biến môi trường thủ công
+    import: optional:file:./.env[.properties]
   application:
     name: uniwork-backend
   profiles:

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { api, errorMessage } from "../api";
 import { useAuth } from "../auth";
@@ -14,6 +14,14 @@ export function LoginPage() {
   const [needVerify, setNeedVerify] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const [mailConfigured, setMailConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    api
+      .get("/auth/config")
+      .then((response) => setMailConfigured(Boolean(response.data.data.mailConfigured)))
+      .catch(() => setMailConfigured(null));
+  }, []);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -40,7 +48,11 @@ export function LoginPage() {
     setResending(true);
     try {
       await api.post("/auth/resend-verification", { email: email.trim() });
-      setMessage("Đã gửi lại email xác thực. Vui lòng kiểm tra hộp thư.");
+      setMessage(
+        mailConfigured === false
+          ? "Máy chủ chưa cấu hình gửi email. Vui lòng liên hệ quản trị viên để được gửi lại liên kết xác thực."
+          : "Đã gửi lại email xác thực. Vui lòng kiểm tra hộp thư.",
+      );
     } catch (err) {
       setError(errorMessage(err));
     } finally {

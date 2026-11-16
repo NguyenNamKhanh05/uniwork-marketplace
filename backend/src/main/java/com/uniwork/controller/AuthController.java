@@ -17,12 +17,16 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Controller Xác thực phiên bản v1 (/api/v1/auth).
@@ -35,6 +39,25 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+
+    @Value("${spring.mail.username:}")
+    private String mailUsername;
+
+    @Value("${app.auth.email-verification-required:true}")
+    private boolean emailVerificationRequired;
+
+    /**
+     * GET /api/v1/auth/config
+     * Cho giao diện biết có bắt buộc xác thực email và máy chủ đã cấu hình gửi mail hay chưa.
+     */
+    @GetMapping("/config")
+    @Operation(summary = "Cấu hình xác thực email và trạng thái gửi mail")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> config() {
+        Map<String, Boolean> data = new LinkedHashMap<>();
+        data.put("emailVerificationRequired", emailVerificationRequired);
+        data.put("mailConfigured", mailUsername != null && !mailUsername.isBlank());
+        return ResponseEntity.ok(ApiResponse.success("OK", data));
+    }
 
     /**
      * POST /api/v1/auth/register

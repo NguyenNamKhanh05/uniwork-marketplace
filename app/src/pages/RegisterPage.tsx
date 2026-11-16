@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { api, errorMessage } from "../api";
 
@@ -16,6 +16,14 @@ export function RegisterPage() {
   const [registered, setRegistered] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const [mailConfigured, setMailConfigured] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    api
+      .get("/auth/config")
+      .then((response) => setMailConfigured(Boolean(response.data.data.mailConfigured)))
+      .catch(() => setMailConfigured(null));
+  }, []);
 
   const update = (key: string, value: string) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -73,9 +81,22 @@ export function RegisterPage() {
         <section className="panel">
           {error && <p className="notice notice-error">{error}</p>}
           {message && <p className="notice notice-success">{message}</p>}
-          <p>
-            Chúng tôi đã gửi liên kết xác thực tới <strong>{form.email.trim()}</strong>.
-          </p>
+          {mailConfigured === false && (
+            <p className="notice notice-error">
+              Máy chủ chưa cấu hình gửi email nên bạn sẽ không nhận được thư xác thực. Quản trị viên
+              cần điền MAIL_USERNAME và MAIL_PASSWORD trong backend/.env rồi khởi động lại backend.
+            </p>
+          )}
+          {mailConfigured === false ? (
+            <p>
+              Đăng ký đã được ghi nhận cho <strong>{form.email.trim()}</strong>, nhưng chưa có email
+              xác thực được gửi đi.
+            </p>
+          ) : (
+            <p>
+              Chúng tôi đã gửi liên kết xác thực tới <strong>{form.email.trim()}</strong>.
+            </p>
+          )}
           <p>
             Mở email, bấm nút "Xác thực tài khoản của tôi" để kích hoạt tài khoản. Liên kết có
             hiệu lực trong 24 giờ.
